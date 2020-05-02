@@ -1,6 +1,6 @@
 package com.nowcoder.controller;
 
-//import com.nowcoder.aspect.LogAspect;
+import com.nowcoder.aspect.LogAspect;
 import com.nowcoder.model.User;
 import com.nowcoder.service.WendaService;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import java.util.*;
 /**
  * Created by nowcoder on 2016/7/10.
  */
-@Controller
+//@Controller
 public class IndexController {
     private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
 
