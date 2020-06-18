@@ -1,8 +1,6 @@
 package com.nowcoder.model;
 
-/**
- * Created by nowcoder on 2016/7/10.
- */
+
 public class User {
     private int id;
     private String name;

@@ -2,10 +2,9 @@ package com.nowcoder.controller;
 
 import com.nowcoder.dao.QuestionDAO;
 import com.nowcoder.dao.UserDAO;
-import com.nowcoder.model.HostHolder;
-import com.nowcoder.model.Question;
-import com.nowcoder.model.User;
-import com.nowcoder.model.ViewObject;
+import com.nowcoder.model.*;
+import com.nowcoder.service.CommentService;
+import com.nowcoder.service.FollowService;
 import com.nowcoder.service.QuestionService;
 import com.nowcoder.service.UserService;
 import org.slf4j.Logger;
@@ -18,14 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by nowcoder on 2016/7/15.
- */
+
 @Controller
 public class HomeController {
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
@@ -42,6 +40,15 @@ public class HomeController {
     @Autowired
     QuestionDAO questionDAO;
 
+    @Autowired
+    FollowService followService;
+
+    @Autowired
+    CommentService commentService;
+
+    @Autowired
+    HostHolder hostHolder;
+
 
 
     private List<ViewObject> getQuestions(int userId, int offset, int limit) {
@@ -49,7 +56,12 @@ public class HomeController {
         List<ViewObject> vos = new ArrayList<>();
         for (Question question : questionList) {
             ViewObject vo = new ViewObject();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = question.getCreatedDate();
+            String strDate = format.format(date);
+            vo.set("strdate", strDate);
             vo.set("question", question);
+            vo.set("followCount", followService.getFollowerCount(EntityType.ENTITY_QUESTION, question.getId()));
             vo.set("user", userService.getUser(question.getUserId()));
             vos.add(vo);
         }
@@ -67,6 +79,19 @@ public class HomeController {
     @RequestMapping(path = {"/user/{userId}"}, method = {RequestMethod.GET, RequestMethod.POST})
     public String userIndex(Model model, @PathVariable("userId") int userId) {
         model.addAttribute("vos", getQuestions(userId, 0, 10));
-        return "index";
+
+        User user = userService.getUser(userId);
+        ViewObject vo = new ViewObject();
+        vo.set("user", user);
+        vo.set("commentCount", commentService.getUserCommentCount(userId));
+        vo.set("followerCount", followService.getFollowerCount(EntityType.ENTITY_USER, userId));
+        vo.set("followeeCount", followService.getFolloweeCount(userId, EntityType.ENTITY_USER));
+        if (hostHolder.getUser() != null) {
+            vo.set("followed", followService.isFollower(hostHolder.getUser().getId(), EntityType.ENTITY_USER, userId));
+        } else {
+            vo.set("followed", false);
+        }
+        model.addAttribute("profileUser", vo);
+        return "profile";
     }
 }

@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-/**
- * Created by nowcoder on 2016/7/2.
- */
+
 @Service
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -25,8 +23,8 @@ public class UserService {
     @Autowired
     private LoginTicketDAO loginTicketDAO;
 
-    public Map<String,String> register(String username,String password){
-        Map<String, String> map = new HashMap<>();
+    public Map<String,Object> register(String username,String password){
+        Map<String, Object> map = new HashMap<String, Object>();
         if (StringUtils.isBlank(username)) {
             map.put("msg", "用户名不能为空");
             return map;
@@ -37,7 +35,7 @@ public class UserService {
         }
         User user = userDAO.selectByName(username);
         if (user != null) {
-            map.put("msg", "用户名已被zhuce");
+            map.put("msg", "用户名已被注册");
             return map;
         }
 
@@ -56,8 +54,8 @@ public class UserService {
         return map;
     };
 
-    public Map<String,String> login(String username,String password){
-        Map<String, String> map = new HashMap<>();
+    public Map<String,Object> login(String username,String password){
+        Map<String, Object> map = new HashMap<String, Object>();
         if (StringUtils.isBlank(username)) {
             map.put("msg", "用户名不能为空");
             return map;
@@ -102,6 +100,9 @@ public class UserService {
         return userDAO.selectById(id);
     }
 
+    public User selectByName(String name) {
+        return userDAO.selectByName(name);
+    }
 
 
 }

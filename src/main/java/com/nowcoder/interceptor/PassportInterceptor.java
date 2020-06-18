@@ -39,7 +39,7 @@ public class PassportInterceptor implements HandlerInterceptor {
                 }
             }
         }
-
+        //将用户保存在threadlocal中,多线程管理
         if (ticket != null) {
             LoginTicket loginTicket = loginTicketDAO.selectByTicket(ticket);
             if (loginTicket == null || loginTicket.getExpired().before(new Date()) || loginTicket.getStatus() != 0) {
@@ -54,7 +54,9 @@ public class PassportInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
-        modelAndView.addObject("user", hostHolder.getUser());
+        if (modelAndView != null && hostHolder.getUser() != null) {
+            modelAndView.addObject("user", hostHolder.getUser());
+        }
     }
 
     @Override
